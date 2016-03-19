@@ -73,6 +73,16 @@ class Remote(QWidget):
         self.status = QLabel(self)
         self.status.move(48,63)
 
+        self.labelMotor = QLabel(self)
+        pixmap = QPixmap("img/cog-speed.png")
+        self.labelMotor.setPixmap(pixmap)
+        self.labelMotor.move(35, 227)
+
+        self.numMotor = QLabel(self)
+        self.numMotor.setText("100")
+        self.numMotor.setStyleSheet("QLabel{ color:#44E4DA; font-size:25px; } ")
+        self.numMotor.move(133, 231)
+
 
         self.homeBtn = QPushButton(self)
         self.homeBtn.setIcon(QIcon('img/home_btn.png'))
@@ -89,8 +99,15 @@ class Remote(QWidget):
             pixmap = QPixmap("img/status_right.png")
         elif msg == 'STOP':
             pixmap = QPixmap("img/status_stop.png")
-        else:
+        elif msg == 'load':
             pixmap = QPixmap("img/status_connecting.png")
+        else:
+            #qstr = QString(msg)
+            slist = msg.split("|")
+            print slist[1]
+            self.numMotor.setText(slist[1])
+            pixmap = QPixmap("img/status_stop.png")
+
 
         self.status.setPixmap(pixmap)
 
