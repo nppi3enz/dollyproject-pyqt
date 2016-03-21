@@ -118,11 +118,11 @@ class Timelapse(QWidget):
     def swapPos(self):
 
         if self.pos == 1:
-            print 'pos = 1'
+            print ('pos = 1')
             self.selectBtn.setIcon(QIcon('img/btn_left.png'))
             self.pos = 2
         elif self.pos == 2:
-            print 'pos = 2'
+            print ('pos = 2')
             self.selectBtn.setIcon(QIcon('img/btn_right.png'))
             self.pos = 1
 

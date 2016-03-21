@@ -22,7 +22,7 @@ class DollyProject(QWidget):
 
         self.setGeometry(0,0,480,320)
         self.setWindowTitle('DollyProject')
-        self.show()
+        self.showFullScreen()
 
     def mainwindow(self):
         print 'call mainwindow'
@@ -106,8 +106,10 @@ class DollyProject(QWidget):
         self.deleteObject()
         self.lbm3.move(0, 0)
         self.nextBtn.move(177, 237)
-        self.homeBtn.move(5, 271)
-        
+
+
+
+
         #self.aboutBtn.clicked.connect(self.backhome)
     def nextstep(self):
         if self.mode_current == 1:
@@ -146,8 +148,6 @@ class DollyProject(QWidget):
         #self.btn3.deleteLater()
         #self.aboutBtn.deleteLater()
         #self.close.deleteLater()
-
-
 
 def main():
     app = QApplication(sys.argv)

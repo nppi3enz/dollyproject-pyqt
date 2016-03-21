@@ -35,18 +35,18 @@ class netpie(QThread):
     #        time.sleep(2)
 
     def connection(self):
-        print 'Now I am connected with netpie (console)'
+        print ('Now I am connected with netpie console')
         self.mySignal.emit('STOP') #default at stop
 
     def disconnect(self):
-        print 'Disconnected!!'
+        print ('Disconnected!!')
 
     def subscription(self,topic,message):
         #print topic+" "+message
         self.mySignal.emit(message)
 
     def welcome(self):
-        print 'Welcome to NETPIE'
+        print ('Welcome to NETPIE')
 
 class Remote(QWidget):
     def __init__(self, net):
@@ -92,7 +92,7 @@ class Remote(QWidget):
 
     def fetch_network(self, msg):
 
-        print 'get MSG : '+msg
+        print ('get MSG : '+msg)
         if msg == 'LEFT':
             pixmap = QPixmap("img/status_left.png")
         elif msg == 'RIGHT':
@@ -104,7 +104,7 @@ class Remote(QWidget):
         else:
             #qstr = QString(msg)
             slist = msg.split("|")
-            print slist[1]
+            print (slist[1])
             self.numMotor.setText(slist[1])
             pixmap = QPixmap("img/status_stop.png")
 
