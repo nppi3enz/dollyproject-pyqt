@@ -9,10 +9,10 @@ appid = 'DollyProject'
 client.create(gearkey,gearsecret,appid)
 
 def connection():
-    print "Now I am connected with netpie"
+    print ("Now I am connected with netpie")
 
 def subscription(topic,message):
-    print topic+" "+message
+    print (topic+" "+message)
 
 client.setname("remote")
 client.setalias("raspberrypi")
