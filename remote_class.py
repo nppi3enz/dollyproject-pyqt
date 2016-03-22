@@ -2,6 +2,8 @@ import sys, os
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+from main import StackedWidget
+
 import microgear.client as client
 import time
 class netpie(QThread):
@@ -10,9 +12,9 @@ class netpie(QThread):
     def __init__(self):
         QThread.__init__(self)
         self.welcome()
+        self.mySignal.emit('load')
         self.create_client()
         #self.start_connect()
-
 
     def create_client(self):
        gearkey = 'K0v7QsvD5AgzE0n'
@@ -21,6 +23,7 @@ class netpie(QThread):
        client.create(gearkey,gearsecret,appid)
 
     def start_connect(self):
+        self.mySignal.emit('load')
         client.setname("remote")
         client.setalias("pyqt")
         client.on_connect = self.connection
@@ -33,89 +36,103 @@ class netpie(QThread):
     #        time.sleep(2)
 
     def connection(self):
-        print 'Now I am connected with netpie (console)'
-        self.mySignal.emit('Now I am connected with netpie')
+        print ('Now I am connected with netpie console')
+        self.mySignal.emit('STOP') #default at stop
 
     def disconnect(self):
-        print 'Disconnected!!'
+        print ('Disconnected!!')
 
     def subscription(self,topic,message):
-        print topic+" "+message
+        #print topic+" "+message
         self.mySignal.emit(message)
 
     def welcome(self):
-        print 'Welcome to NETPIE'
+        print ('Welcome to NETPIE')
 
+class Remote(QWidget):
+    #constructor
+    def __init__(self, stack):
+        #super(Remote, self).__init__()
+        QWidget.__init__(self, stack)
+        #self.stack = stack
 
-class Remote_Class(QWidget):
-    def __init__(self, net):
-        super(Remote_Class, self).__init__()
-        self.create_main_frame()
-        self.net = net
-        self.net.mySignal.connect(self.toLog)
-        #self.create_client()
+        self.net = netpie()
+        self.initUI(stack)
+        self.net.mySignal.connect(self.fetch_network)
+        #self.net.start_connect()
 
-    def create_main_frame(self):
+    def initUI(self, stack):
+        self.stack = stack
 
-        self.cw = QWidget(self)
-        self.doit_button = QPushButton('Do it!')
-        self.doit_button.clicked.connect(self.on_doit)
-        #self.connect(self.doit_button, SIGNAL("testcall()"), self.netpie_console)
-        self.discon_button = QPushButton('Disconnect')
-        self.discon_button.clicked.connect(self.on_doit)
-
-        #self.log_widget = LogWidget()
-
-
-        hbox = QHBoxLayout()
-        self.listWidget = QListWidget()
-        hbox.addWidget(self.doit_button)
-        hbox.addWidget(self.discon_button)
-        hbox.addWidget(self.listWidget)
-        #hbox.addWidget(self.log_widget)
-
-        main_frame = QWidget(self)
-        main_frame.setLayout(hbox)
-
+        self.callwindow()
+        self.fetch_network('load')
 
         self.setGeometry(0,0,480,320)
-        self.setWindowTitle('DollyProject')
+        self.setWindowTitle('Remote')
         self.show()
 
-    def create_timer(self):
-        self.circle_timer = QTimer(self)
-        self.circle_timer.timeout.connect(self.circle_widget.next)
-        self.circle_timer.start(25)
+    def callwindow(self):
+        self.lbl = QLabel(self)
+        pixmap = QPixmap("img/blank_remote.png")
+        self.lbl.setPixmap(pixmap)
+        #self.lbl.setGeometry(0,0,480,320)
+        #self.lbl.move(140, 30)
+        self.status = QLabel(self)
+        self.status.move(48,63)
 
-    def on_doit(self):
-        #self.log('Connecting...')
-        self.toLog('Connecting')
+        self.labelMotor = QLabel(self)
+        pixmap = QPixmap("img/cog-speed.png")
+        self.labelMotor.setPixmap(pixmap)
+        self.labelMotor.move(35, 227)
 
-        #server = netpie()
-        #toLog = self.toLog
-        #server.start_connect()
-        self.net.start_connect()
-        #self.connect(server, SIGNAL(server.start_connect()), toLog, SLOT(server.connection()));
-        #server.mySignal.connect(self.test)
-        #self.netpie.connect(self.start_connect)
-    def disconnect_doit(self):
-        server = netpie()
-        server.disconnect()
-
-
-        #self.emit(SIGNAL(self.netpie_console.start_connect()))
-    def toLog(self, msg):
-        self.listWidget.addItem(msg);
-
-    def test(self):
-        print 'testtest'
+        self.numMotor = QLabel(self)
+        self.numMotor.setText("100")
+        self.numMotor.setStyleSheet("QLabel{ color:#44E4DA; font-size:25px; } ")
+        self.numMotor.move(133, 231)
 
 
-def main():
-    net = netpie()
-    app = QApplication(sys.argv)
-    ex = Remote_Class(net)
-    sys.exit(app.exec_())
+        self.homeBtn = QPushButton(self)
+        self.homeBtn.setIcon(QIcon('img/home_btn.png'))
+        self.homeBtn.setIconSize(QSize(50,46))
+        self.homeBtn.resize(50,46)
+        #self.homeBtn.move(5, 271)
+        self.homeBtn.move(50, 271)
+        self.homeBtn.clicked.connect(self.goHome)
 
-if __name__ == '__main__':
-    main()
+    def goHome(self):
+        print ("GO HOME")
+        self.lbl.move(-1000,-1000)
+        self.homeBtn.move(-1000,1000)
+        self.stack.setPage1()
+
+
+    def fetch_network(self, msg):
+
+        print ('get MSG : '+msg)
+        if msg == 'LEFT':
+            pixmap = QPixmap("img/status_left.png")
+        elif msg == 'RIGHT':
+            pixmap = QPixmap("img/status_right.png")
+        elif msg == 'STOP':
+            pixmap = QPixmap("img/status_stop.png")
+        elif msg == 'load':
+            pixmap = QPixmap("img/status_connecting.png")
+        else:
+            #qstr = QString(msg)
+            slist = msg.split("|")
+            print (slist[1])
+            self.numMotor.setText(slist[1])
+            pixmap = QPixmap("img/status_stop.png")
+
+
+        self.status.setPixmap(pixmap)
+
+
+#def main():
+#    net = netpie()
+#    app = QApplication(sys.argv)
+#    ex = Remote(net)
+#    sys.exit(app.exec_())
+
+#if __name__ == '__main__':
+#    main()
