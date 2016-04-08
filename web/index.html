@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, maximum-scale=1.0, minimal-ui' name='viewport' />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Remote DollyProject</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <script src="https://netpie.io/microgear.js"></script>
+<script>
+  const APPKEY    = "K0v7QsvD5AgzE0n";
+  const APPSECRET = "tGEE3SdcIpo2sDfzx3mHqKcm4Jd92s";
+  const APPID     = "DollyProject";
+
+    var microgear = Microgear.create({
+        gearkey: APPKEY,
+        gearsecret: APPSECRET
+    });
+
+    microgear.on('message',function(topic,msg) {
+      if(msg == "LEFT" || msg == "RIGHT" || msg == "STOP") {
+        document.getElementById("message").innerHTML = msg;
+      }
+    });
+
+    microgear.on('connected', function() {
+        microgear.setname('remote');
+        $("#message").html('Ready');
+        $("#light").html('<img src="img/status-on.png" />');
+        $('.circle').show()
+        /*document.getElementById("message").innerHTML = "Now I am connected with netpie...";
+        setInterval(function() {
+            microgear.chat("remote","Hello from myself at "+Date.now());
+        },5000);*/
+    });
+
+    microgear.on("closed", function() {
+      $("#message").html('Disconnected');
+      $("#light").html('<img src="img/status-off.png" />');
+    });
+
+    microgear.on('present', function(event) {
+        console.log(event);
+    });
+
+    microgear.on('absent', function(event) {
+        console.log(event);
+    });
+
+    microgear.resettoken(function(err) {
+        microgear.connect(APPID);
+    });
+
+
+</script>
+  </head>
+  <style>
+  body{
+  /*  background: #ccc;*/
+  background: #242424;
+    color: #fff;
+    text-align: center;
+    -webkit-user-select: none;
+    -webkit-text-size-adjust: none;
+  }
+  a{
+    color: #fff;
+  }
+  a:hover{
+    color: #ff0000;
+    text-decoration: none;
+  }
+  a:visited{
+    text-decoration: none;
+  }
+  .remote{
+    background: #242424;
+    display: block;
+    /*width: 385px;
+    height: 568px;*/
+    margin: auto;
+    position: relative;
+  }
+  #status{
+    width:90%;
+    position: relative;
+    margin:0 auto;
+    padding-top: 20px;
+  }
+  #status .left, #status .right{
+    display: inline-block;
+    position: absolute;
+    width:40px;
+    height:63px;
+  }
+  #status .left{
+    left:0;
+    background-image: url('img/left_status.png');
+    background-color: #242424;
+  }
+  #status .right{
+    right:0;
+    background-image: url('img/right_status.png');
+    background-color: #242424;
+  }
+  #status .center{
+    background-image: url('img/bg_status.png');
+    display: inline-block;
+    height: 63px;
+    width:80%;
+
+  }
+  #message{
+    margin-left: 40px;
+    padding-top: 20px;
+    margin-right: 40px;
+    text-align: center;
+    color: #31FFFE;
+  }
+  .footer{
+    position: absolute;
+    bottom:0;
+    margin-left:auto;
+    display: block;
+    width:100%;
+    height:0px;
+  }
+  .power, .show-status, .refresh{
+    display: inline-block;
+    border: 1px solid red;
+  }
+  .show-status{
+    top:0;
+    padding-bottom: 10px;
+  }
+  .btn-power{
+    background-image: url('img/power.png');
+    display: block;
+    width: 83px;
+    height: 77px;
+    float: right;
+    border: 0px;
+  }
+  .btn-refresh{
+    background-image: url('img/refresh.png');
+    display: block;
+    width: 84px;
+    height: 77px;
+    float: left;
+    border: 0px;
+  }
+  .btn-power:hover, .btn-refresh:hover{
+    opacity: 0.5;
+  }
+  .col2{
+    padding-top: 10px;
+  }
+  .circle{
+    margin-top: 0px;
+  }
+  .c-left{
+    background: url('img/circle.png') 0 0;
+    display: inline-block;
+    width: 125px;
+    height: 256px;
+    border: 0px;
+    padding: 0px 0px;
+
+  }
+  .c-right{
+    background: url('img/circle.png') 124px 0;
+    display: inline-block;
+    width: 125px;
+    height: 259px;
+    border: 0px;
+    margin-left:-3px;
+  }
+  .c-left:hover,.c-right:hover{
+    opacity: 0.5;
+  }
+  .container{
+    max-width: 460px;
+  }
+  .setting{
+    /*text-align: left;*/
+  }
+  /* Portrait */
+@media screen and (max-width: 400px) {
+    .c-right{
+    height: 256px;
+    margin-left: -5px;
+
+  }
+}
+
+
+  </style>
+  <body>
+    <div class="container">
+<div class="remote">
+  <div id="status">
+    <div class="left"></div>
+    <div class="center">
+      <div id="message">
+        Loading...
+      </div>
+    </div>
+    <div class="right"></div>
+  </div>
+  <div class="row col2">
+  <div class="col-md-5 col-xs-5" ><button class="btn-power"></button></div>
+  <div id="light" class="col-md-2 col-xs-2" style="padding:0px 0px;">
+      <img src="img/status-off.png" />
+  </div>
+  <div class="col-md-5 col-xs-5" ><button class="btn-refresh"></button></div>
+</div>
+
+  <div class="circle" style="display:none">
+    <button class="c-left" ></button>
+    <button class="c-right"></button>
+  </div>
+
+  <div class="footer">
+    <img src="img/logo_remote.png" >
+  </div>
+  <div class="setting">
+    <a href="#" onclick="return changeSpeed();">Speed: <span class="numspeed">100</span> <i class="fa fa-cog fa-lg"></i></a>
+  </div>
+</div>
+</div>
+<script>
+var timeout, btn_left = $('.c-left'), btn_right = $('.c-right');
+var count = 0;
+
+
+//------------------for iphone version
+$(".c-left").on("touchstart",function(){
+  console.log(count++);
+  microgear.chat("remote","LEFT");
+});
+$(".c-right").on("touchstart",function(){
+  console.log(count++);
+  microgear.chat("remote","RIGHT");
+});
+$(".c-left").on("touchend",function(){
+  count=0;
+  microgear.chat("remote","STOP");
+});
+$(".c-right").on("touchend",function(){
+  count=0;
+  microgear.chat("remote","STOP");
+});
+//------------------for web version
+btn_left.mousedown(function(){
+    timeout = setInterval(function(){
+        console.log(count++);
+        microgear.chat("remote","LEFT");
+    }, 500);
+
+    return false;
+});
+btn_right.mousedown(function(){
+    timeout = setInterval(function(){
+        console.log(count++);
+        microgear.chat("remote","RIGHT");
+    }, 500);
+
+    return false;
+});
+$(document).mouseup(function(){
+    count=0;
+    microgear.chat("remote","STOP");
+    clearInterval(timeout);
+    return false;
+});
+
+function changeSpeed(){
+    var x;
+    var speed=prompt("Please number of speed (0-255)","100");
+    if (speed!=null){
+       //x="Hello " + name + "! How are you today?";
+      //alert(x);
+      if(speed >= 0 && speed <= 255) {
+        microgear.chat("remote","speed|"+speed);
+        $(".numspeed").html(speed);
+      } else {
+        alert("ข้อมูลไม่ถูกต้อง กรุณกรอกใหม่ค่ะ");
+      }
+   }
+   return false;
+}
+
+</script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+  </body>
+</html>
