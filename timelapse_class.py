@@ -2,7 +2,14 @@ import sys, os
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+import time
+import atexit
+from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
+from motor_class import *
+from guiLoop import guiLoop, stopLoop
+
 class Timelapse(QWidget):
+    started = False
     def __init__(self, stack):
         #super(Timelapse, self).__init__()
         QWidget.__init__(self, stack)
@@ -18,6 +25,7 @@ class Timelapse(QWidget):
         self.setGeometry(0,0,480,320)
         self.setWindowTitle('Timelapse')
         self.show()
+        self.motor = motor()
 
     def callwin_timelapse(self):
 
@@ -98,7 +106,7 @@ class Timelapse(QWidget):
         self.numRound.move(87, 149)
 
         self.statusTL = QLabel(self)
-        self.statusTL.setText("connecting...")
+        self.statusTL.setText("ready")
         self.statusTL.setStyleSheet("QLabel{ color:#ffffff; font-size:20px; qproperty-alignment: AlignCenter;} ")
         self.statusTL.resize(374,40)
         self.statusTL.move(58, 198)
@@ -108,12 +116,14 @@ class Timelapse(QWidget):
         self.startBtn_tl.setIconSize(QSize(104,56))
         self.startBtn_tl.resize(104,56)
         self.startBtn_tl.move(117,241)
+        self.startBtn_tl.clicked.connect(self.playTimelapse)
 
         self.stopBtn_tl = QPushButton(self)
         self.stopBtn_tl.setIcon(QIcon('img/btn_stop_small.png'))
         self.stopBtn_tl.setIconSize(QSize(104,56))
         self.stopBtn_tl.resize(104,56)
         self.stopBtn_tl.move(256,241)
+        self.stopBtn_tl.clicked.connect(self.stopTimelapse)
 
         self.homeBtn = QPushButton(self)
         self.homeBtn.setIcon(QIcon('img/home_btn.png'))
@@ -131,7 +141,6 @@ class Timelapse(QWidget):
 
 
     def swapPos(self):
-
         if self.pos == 1:
             print ('pos = 1')
             self.selectBtn.setIcon(QIcon('img/btn_left.png'))
@@ -176,3 +185,41 @@ class Timelapse(QWidget):
             self.t_round = 1
         show = QString("%1").arg(self.t_round)
         self.numRound.setText(show)
+
+    def playTimelapse(self):
+        if not self.started:
+            # you can also use threads here, see the first link
+            self.started = self.StartLoop()
+
+    def stopTimelapse(self):
+        if self.started:
+            	stopLoop(self.started)
+            	self.started = False
+		self.motor.turnOffMotors()
+		self.statusTL.setText("Stop")
+
+    @guiLoop
+    def StartLoop(self):
+        self.statusTL.setText("START")
+        iSecond = self.t_start
+        iRound =  self.t_round
+        iStop = self.t_stop
+        iMode =  self.pos
+        for x in range(iRound):
+
+       		if iMode==1:
+                	self.statusTL.setText("LEFT: Round "+str(x+1))
+            		self.motor.left()
+                  	yield iSecond
+                    	self.statusTL.setText("STOP: Round "+str(x+1))
+            		self.motor.stop()
+                  	yield iStop
+          	else:
+                	self.statusTL.setText("RIGHT: Round "+str(x+1))
+            		self.motor.right()
+                  	yield iSecond
+                    	self.statusTL.setText("STOP: Round "+str(x+1))
+            		self.motor.stop()
+                  	yield iStop
+
+        self.statusTL.setText("Complete!!")
