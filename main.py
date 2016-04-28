@@ -195,7 +195,7 @@ class StackedWidget(QStackedWidget):
         self.setCurrentIndex(0)
 
     def setPage2(self): #page remote
-        
+
         self.setCurrentIndex(1)
 
     def setPage3(self): #page face-detection
@@ -223,7 +223,8 @@ def main():
     window.move(0,0)
     window.resize(480,320)
     window.layout().setContentsMargins(0, 0, 0, 0)
-    window.show()
+    #window.show()
+    window.showFullScreen()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

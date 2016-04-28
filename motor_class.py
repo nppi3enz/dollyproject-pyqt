@@ -13,7 +13,8 @@ class motor(QThread):
 
         self.mh = Adafruit_MotorHAT(addr=0x60)
         atexit.register(self.turnOffMotors)
-        self.myMotor_front = self.mh.getMotor(3)
+        self.myMotor_front = self.mh.getMotor(1)
+        self.myMotor_back = self.mh.getMotor(4)
         #self.myMotor_front.setSpeed(mySpeed)
 
     def turnOffMotors(self):
@@ -25,14 +26,18 @@ class motor(QThread):
 
     def left(self):
         self.myMotor_front.run(Adafruit_MotorHAT.FORWARD)
+        self.myMotor_back.run(Adafruit_MotorHAT.FORWARD)
         print "\tSpeed up...to"+str(self.mySpeed)
         self.myMotor_front.setSpeed(self.mySpeed)
+        self.myMotor_back.setSpeed(self.mySpeed)
         time.sleep(0.01)
 
     def right(self):
         self.myMotor_front.run(Adafruit_MotorHAT.BACKWARD)
+        self.myMotor_back.run(Adafruit_MotorHAT.BACKWARD)
         print "\tSpeed up...to"+str(self.mySpeed)
         self.myMotor_front.setSpeed(self.mySpeed)
+        self.myMotor_back.setSpeed(self.mySpeed)
         time.sleep(0.01)
 
     def stop(self):

@@ -8,11 +8,38 @@ import time
 import cv2
 import imutils
 import numpy as np
+import atexit
+from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 
 root = Tk()
 
 
 x=y=w=h=selectX=selectY=selectWidth=selectHeight=0
+
+def left():
+    myMotor_front.run(Adafruit_MotorHAT.FORWARD)
+    myMotor_back.run(Adafruit_MotorHAT.FORWARD)
+    print "\tSpeed up...to"+str(mySpeed)
+    myMotor_front.setSpeed(mySpeed)
+    myMotor_back.setSpeed(mySpeed)
+    time.sleep(0.01)
+
+def right():
+    myMotor_front.run(Adafruit_MotorHAT.BACKWARD)
+    myMotor_back.run(Adafruit_MotorHAT.BACKWARD)
+    print "\tSpeed up...to"+str(mySpeed)
+    myMotor_front.setSpeed(mySpeed)
+    myMotor_back.setSpeed(mySpeed)
+    time.sleep(0.01)
+
+def stop():
+    turnOffMotors()
+
+def turnOffMotors():
+    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
@@ -22,7 +49,7 @@ camera.resolution = (480, 320)
 #camera.contrast = 50
 camera.exposure_mode = 'fixedfps'
 #camera.framerate = 32
-camera.rotation = 180
+camera.rotation = 0
 rawCapture = PiRGBArray(camera, size=(480, 320))
 
 min_area = 500000
@@ -39,6 +66,16 @@ mode = 1
 textControl = None
 checkMode2 = None
 
+mySpeed = 255
+
+#intital motor
+print ("initial motor at "+str(mySpeed))
+
+mh = Adafruit_MotorHAT(addr=0x60)
+atexit.register(turnOffMotors)
+myMotor_front = mh.getMotor(1)
+myMotor_back = mh.getMotor(4)
+
 # capture frames from the camera
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     if mode == 1:
@@ -51,7 +88,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         fgmask = fgbg.apply(image)
         # show the frame
         #cv2.imshow("Original", image)
-        cv2.imshow("Mask", fgmask)
+        #cv2.imshow("Mask", fgmask)
 
         thresh = fgmask.copy()
         (_, cnts, _) = cv2.findContours(thresh, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -77,7 +114,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # if the `q` key was pressed, break from the loop
         if key == ord("q"):
             crop_img = image[y: y + h, x: x + w]
-            cv2.imshow("cropped", crop_img)
+            #cv2.imshow("cropped", crop_img)
             mode = 2
             #break
 
@@ -112,15 +149,19 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         x,y,w,h = track_window
         output = cv2.rectangle(image, (x,y), (x+w,y+h), 255,2)
         cv2.putText(output, " {}".format(textControl),(10, 20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
-        cv2.putText(output, "("+str(x)+" , "+str(y)+") : ("+str(x+w)+","+str(y+h)+")",(10, 250),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+        cv2.putText(output, "("+str(x)+","+str(y)+") : ("+str(x+w)+","+str(y+h)+")",(10, 250),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
         #check motion
         if x<boundLeft:
             textControl = "RIGHT"
+            right()
         elif x+w>boundRight:
             textControl = "LEFT"
+            left()
+
         else:
             textControl = ""
+            stop()
 
 
 

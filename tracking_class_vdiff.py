@@ -17,7 +17,7 @@ camera.resolution = (480, 320)
 #camera.contrast = 50
 camera.exposure_mode = 'fixedfps'
 #camera.framerate = 32
-camera.rotation = 180
+camera.rotation = 0
 rawCapture = PiRGBArray(camera, size=(480, 320))
 
 min_area = 500000
